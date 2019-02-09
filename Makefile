@@ -8,5 +8,5 @@ clean:
 tidy: clean
 	-/bin/rm -rf *~ .*~
 
-implicit-test.o: implicit-test.c implicit.h	
+implicit-test.o: implicit-test.c implicit.h	tests.h
 implicit.o: implicit.c implicit.h	
