@@ -4,21 +4,7 @@
 #include <inttypes.h>
 #include <sys/time.h>
 #include "implicit.h"
-
-/*
- * Set to 1 for additional debugging statements.
- */
-#define DEBUG 0
-
-/*
- * Default size for the heap is 2MB( 2^21 B).
- */
-#define HEAP_SIZE (1 << 21)
-
-/*
- * Default size for array holding pointers returned by malloc.
- */
-#define MAX_POINTERS 1000
+#include "tests.h"
 
 /*
  * Function to initialize the random number generator.
@@ -102,6 +88,10 @@ unsigned long test_heap(search_alg_t search_alg, int op_count)
  */
 int main(int argc, char *argv[])
 {
+
+  /* call unit tests from here
+   */
+
   initialize_rng();
   
   /*

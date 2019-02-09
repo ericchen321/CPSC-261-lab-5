@@ -235,3 +235,31 @@ void *heap_malloc(heap *h, block_size_t size)
   }
   return NULL;
 }
+
+/*
+ * wrapper function for get_size_to_allocate
+ */
+block_size_t wrapper_get_size_to_allocate(block_size_t user_size){
+  return get_size_to_allocate(user_size);
+}
+
+/*
+ * wrapper function for prepare_block_for_use
+ */
+void *wrapper_prepare_block_for_use(void *block_start, block_size_t real_size){
+  prepare_block_for_use(block_start, real_size);
+}
+
+/*
+ * wrapper function for get_previous_block
+ */
+void *wrapper_get_previous_block(void *block_start){
+  get_previous_block(block_start);
+}
+
+/*
+ * wrapper function for coalesce
+ */
+void *wrapper_coalesce(heap *h, void *first_block_start){
+  coalesce(h, first_block_start);
+}
