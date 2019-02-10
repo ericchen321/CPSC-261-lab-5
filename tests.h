@@ -20,8 +20,6 @@
 
 void initialize_heaps(heap** h_0, heap** h_1, search_alg_t search_alg);
 
-/*
- * headers for unit tests
- */
+void unit_tests();
 
 #endif

@@ -48,3 +48,26 @@ void initialize_heaps(heap** h_0, heap** h_1, search_alg_t search_alg){
     return;
   }
 }
+
+/*
+ * running all unit tests
+ */
+void unit_tests(){
+  heap* h_0; heap* h_1;
+
+  // tests: heap_print
+  initialize_heaps(&h_0, &h_1, HEAP_FIRSTFIT);
+  heap_print(h_0);
+  heap_print(h_1);
+
+  // tests: heap_find_avg_free_block_size
+  initialize_heaps(&h_0, &h_1, HEAP_FIRSTFIT);
+  if(heap_find_avg_free_block_size(h_0)==24){}
+  else{
+    printf("find average free block size of h_0 failed\n");
+  }
+  if(heap_find_avg_free_block_size(h_1)==38){}
+  else{
+    printf("find average free block size of h_1 failed\n");
+  }
+}

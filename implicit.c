@@ -170,6 +170,15 @@ heap *heap_create(intptr_t size, search_alg_t search_alg)
 void heap_print(heap *h)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
+  void* blk;
+  for(blk=h->start; is_within_heap_range(h, blk); blk=get_next_block(blk)){
+    printf("Block at address %lx\n", (long int)blk);
+    printf("  Size: %d\n", (int)get_block_size(blk));
+    if(block_is_in_use(blk))
+      printf("  In use: Yes\n");
+    else
+      printf("  In use: No\n");  
+  }
 }
 
 /*
@@ -178,7 +187,16 @@ void heap_print(heap *h)
 block_size_t heap_find_avg_free_block_size(heap *h)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
-  return 0;
+  void* blk;
+  intptr_t count = 0;
+  block_size_t sum = 0;
+  for (blk = h->start; is_within_heap_range(h, blk); blk = get_next_block(blk)){
+    if(!block_is_in_use(blk)){
+      sum += get_block_size(blk);
+      count += 1;
+    }
+  }
+  return sum / count;
 }
 
 /*
