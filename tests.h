@@ -18,6 +18,9 @@
  */
 #define MAX_POINTERS 1000
 
+/*
+ * running all unit tests
+ */
 void unit_tests();
 
 #endif
