@@ -6,7 +6,7 @@
 /*
  * Set to 1 for additional debugging statements.
  */
-#define DEBUG 0
+#define DEBUG 1
 
 /*
  * Default size for the heap is 2MB( 2^21 B).
@@ -17,6 +17,8 @@
  * Default size for array holding pointers returned by malloc.
  */
 #define MAX_POINTERS 1000
+
+void initialize_heaps(heap** h_0, heap** h_1, search_alg_t search_alg);
 
 /*
  * headers for unit tests

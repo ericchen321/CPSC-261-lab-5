@@ -75,4 +75,14 @@ void *wrapper_get_previous_block(void *block_start);
  */
 void *wrapper_coalesce(heap *h, void *first_block_start);
 
+/*
+ * wrapper function for set_block_header
+ */
+void wrapper_set_block_header(void *block_start, block_size_t block_size, int in_use);
+
+/*
+ * wrapper function for is_within_heap_range
+ */
+int wrapper_is_within_heap_range(heap *h, void *addr);
+
 #endif

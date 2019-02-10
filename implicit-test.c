@@ -88,9 +88,11 @@ unsigned long test_heap(search_alg_t search_alg, int op_count)
  */
 int main(int argc, char *argv[])
 {
+  heap* h_0; heap* h_1;
 
   /* call unit tests from here
    */
+  initialize_heaps(&h_0, &h_1, HEAP_FIRSTFIT);
 
   initialize_rng();
   

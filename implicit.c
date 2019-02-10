@@ -160,6 +160,7 @@ heap *heap_create(intptr_t size, search_alg_t search_alg)
   h->search_alg = search_alg;
   
   h->next = h->start;
+  // printf("*h points to %ld, size is %ld, delta is %d, heap_start is %ld, heap_end is %ld\n", (long int)h, (long int)size, delta, (long int)h->start, (long int)(h->start + h->size));
   set_block_header(h->start, size, 0);
   return h;
 }
@@ -262,4 +263,18 @@ void *wrapper_get_previous_block(void *block_start){
  */
 void *wrapper_coalesce(heap *h, void *first_block_start){
   return coalesce(h, first_block_start);
+}
+
+/*
+ * wrapper function for set_block_header
+ */
+void wrapper_set_block_header(void *block_start, block_size_t block_size, int in_use){
+  set_block_header(block_start, block_size, in_use);
+}
+
+/*
+ * wrapper function for is_within_heap_range
+ */
+int wrapper_is_within_heap_range(heap *h, void *addr){
+  return is_within_heap_range(h, addr);
 }
