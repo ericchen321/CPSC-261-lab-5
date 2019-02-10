@@ -112,7 +112,12 @@ static inline void *coalesce(heap *h, void *first_block_start)
 static inline block_size_t get_size_to_allocate(block_size_t user_size)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
-  return 0;
+  if(user_size % PAYLOAD_ALIGN == 0){
+    return user_size + 2*HEADER_SIZE;
+  }
+  else{
+    return (user_size / PAYLOAD_ALIGN + 2)*PAYLOAD_ALIGN;
+  }  
 }
 
 /*
@@ -172,7 +177,7 @@ void heap_print(heap *h)
   /* TO BE COMPLETED BY THE STUDENT. */
   void* blk;
   for(blk=h->start; is_within_heap_range(h, blk); blk=get_next_block(blk)){
-    printf("Block at address %lx\n", (long int)blk);
+    printf("Block at address %lx\n", (long int)(blk + HEADER_SIZE));
     printf("  Size: %d\n", (int)get_block_size(blk));
     if(block_is_in_use(blk))
       printf("  In use: Yes\n");
