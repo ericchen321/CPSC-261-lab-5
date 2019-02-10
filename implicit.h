@@ -85,4 +85,14 @@ void wrapper_set_block_header(void *block_start, block_size_t block_size, int in
  */
 int wrapper_is_within_heap_range(heap *h, void *addr);
 
+/*
+ * wrapper function for get_next_block
+ */
+void *wrapper_get_next_block(void *block_start);
+
+/*
+ * wrapper function for get_block_size
+ */
+block_size_t wrapper_get_block_size(void *block_start);
+
 #endif

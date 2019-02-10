@@ -61,6 +61,20 @@ void initialize_heaps(heap** h_0, heap** h_1, heap** h_2, search_alg_t search_al
   }
 }
 
+// case: try get prev block of a block in the middle, expects prev block
+void test_get_previous_block_case_0(heap **h_0, heap **h_1, heap **h_2){
+  void* blk;
+  blk = (*h_1)->start;
+  blk = wrapper_get_next_block(blk);
+  blk = wrapper_get_next_block(blk);
+  blk = wrapper_get_next_block(blk);
+  blk = wrapper_get_previous_block(blk);
+  if(blk != NULL && wrapper_get_block_size(blk) == 64){}
+  else{
+    printf("get prev block of 3rd block from h_1 failed\n");
+  }
+}
+
 /*
  * running all unit tests
  */
@@ -106,5 +120,9 @@ void unit_tests(){
     printf("get min block size when user size is 24 failed\n");
   }
 
+  // TODO tests: prepare_block_for_use
 
+  // tests: get_previous_block
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_get_previous_block_case_0(&h_0, &h_1, &h_2);
 }

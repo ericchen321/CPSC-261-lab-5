@@ -69,10 +69,11 @@ static inline void *get_next_block(void *block_start)
 /*
  * Find the start of the previous block.
  */
+// FIXME: now requires user not passing in 0th block
 static inline void *get_previous_block(void *block_start)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
-  return NULL;
+  return block_start - get_block_size(block_start - HEADER_SIZE);
 }
 
 /*
@@ -300,4 +301,19 @@ void wrapper_set_block_header(void *block_start, block_size_t block_size, int in
  */
 int wrapper_is_within_heap_range(heap *h, void *addr){
   return is_within_heap_range(h, addr);
+}
+
+/*
+ * wrapper function for get_next_block
+ */
+void *wrapper_get_next_block(void *block_start){
+  return get_next_block(block_start);
+}
+
+/*
+ * wrapper function for get_block_size
+ */
+block_size_t wrapper_get_block_size(void *block_start)
+{
+  return get_block_size(block_start);
 }
