@@ -73,7 +73,17 @@ static inline void *get_next_block(void *block_start)
 static inline void *get_previous_block(void *block_start)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
-  return block_start - get_block_size(block_start - HEADER_SIZE);
+
+  void* prev = block_start - HEADER_SIZE;
+  block_size_t size = *((block_size_t *) prev);
+
+  if(size%2==0){
+    return block_start - get_block_size(block_start-size);
+  }
+  else{
+    return block_start - get_block_size(block_start - size-1);
+  }
+  
 }
 
 /*
@@ -102,7 +112,24 @@ static inline int is_within_heap_range(heap *h, void *addr)
 static inline void *coalesce(heap *h, void *first_block_start)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
-  return NULL;
+  
+  //Check if curent block is free.
+  if(!block_is_in_use(first_block_start)){
+  void * next = get_next_block(first_block_start);
+
+  //Check if next block is free. If it is, change header of first and footer
+  // of second to total size.
+  if(!block_is_in_use(next)&& is_within_heap_range(h,next)){
+    int total_size = get_block_size(first_block_start)+ get_block_size(next);
+    void* footer = first_block_start + total_size - 4;
+
+    *(block_size_t*) footer = total_size;
+    *(block_size_t*) first_block_start = total_size;
+
+    return first_block_start;
+  }
+}
+  return NULL; //return NULL if block not coalesced 
 }
 
 /*

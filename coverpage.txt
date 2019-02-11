@@ -23,17 +23,17 @@ file.
 
 
 STUDENT  1
-Name :
-St. No:
-Unix Id :
-Email:
+Name : Siddhantha Bose
+St. No: 72127467
+Unix Id : j1o1b
+Email: siddhanthab1@gmail.com
 
 
 STUDENT  2
-Name :
-St. No:
-Unix Id :
-Email:
+Name : Guanxiong Chen
+St. No: 13108155
+Unix Id : i0y0b
+Email: chenguanxiong@alumni.ubc.ca
 
 
 ACKNOWLEDGMENTS, COMMENTS AND CITATIONS :
