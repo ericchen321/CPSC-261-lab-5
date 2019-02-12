@@ -117,16 +117,16 @@ static inline void *coalesce(heap *h, void *first_block_start)
   
   //Check if curent block is free.
   if(!block_is_in_use(first_block_start)){
-  void * next = get_next_block(first_block_start);
+    void * next = get_next_block(first_block_start);
 
-  //Check if next block is free. If it is, change header of first and footer
-  // of second to total size.
-  if(!block_is_in_use(next)&& is_within_heap_range(h,next)){
-    int total_size = get_block_size(first_block_start)+ get_block_size(next);
-    set_block_header(first_block_start, total_size, 0);
-    return first_block_start;
+    // Check if next block exits and is free. If both are true, change header of first and footer
+    // of second to total size.
+    if(is_within_heap_range(h, next) && !block_is_in_use(next)){
+      int total_size = get_block_size(first_block_start)+ get_block_size(next);
+      set_block_header(first_block_start, total_size, 0);
+      return first_block_start;
+    }
   }
-}
   return first_block_start; //return unmodified first block if block not coalesced 
 }
 
