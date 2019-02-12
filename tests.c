@@ -159,6 +159,70 @@ void test_get_previous_block_case_1(heap **h_0, heap **h_1, heap **h_2){
   }
 }
 
+/* case: cannot coalesce because given block is not free
+ */
+void test_coalesce_case_0(heap **h_0, heap **h_1, heap **h_2){
+  void* blk;
+  blk = (*h_1)->start;
+  blk = wrapper_coalesce(*h_1, blk);
+  if(blk != NULL
+      && wrapper_get_block_size(blk) == 16
+      && wrapper_get_block_size(wrapper_get_next_block(blk)) == 32){}
+  else{
+    printf("call coalesce when given block is occupied test failed\n");
+  }
+}
+
+/* case: cannot coalesce because following block exists but is not free
+ */
+void test_coalesce_case_1(heap **h_0, heap **h_1, heap **h_2){
+  void* blk;
+  blk = (*h_1)->start;
+  blk = wrapper_get_next_block(blk);
+  blk = wrapper_get_next_block(blk);
+  blk = wrapper_get_next_block(blk); // blk is 3rd one in h_1
+
+  blk = wrapper_coalesce(*h_1, blk);
+  if(blk != NULL
+      && wrapper_get_block_size(blk) == 32
+      && wrapper_get_block_size(wrapper_get_next_block(blk)) == 16){}
+  else{
+    printf("call coalesce when following block is occupied test failed\n");
+  }
+}
+
+/* case: cannot coalesce because following block does not exist
+ */
+void test_coalesce_case_2(heap **h_0, heap **h_1, heap **h_2){
+  void* blk;
+  blk = (*h_2)->start;
+  blk = wrapper_get_next_block(blk);
+  blk = wrapper_get_next_block(blk);
+
+  blk = wrapper_coalesce(*h_2, blk);
+  if(blk != NULL
+      && wrapper_get_block_size(blk) == 424){}
+  else{
+    printf("call coalesce when following block does not exist test failed\n");
+  }
+}
+
+/* case: both blocks are free, can coalesce
+ */
+void test_coalesce_case_3(heap **h_0, heap **h_1, heap **h_2){
+  void* blk;
+  blk = (*h_1)->start;
+  blk = wrapper_get_next_block(blk); // blk is 1st one in h_1
+
+  blk = wrapper_coalesce(*h_1, blk);
+  if(blk != NULL
+      && wrapper_get_block_size(blk) == 96
+      && wrapper_get_block_size(wrapper_get_next_block(blk)) == 32){}
+  else{
+    printf("call coalesce when both blocks are free failed\n");
+  }
+}
+
 /*
  * running all unit tests
  */
@@ -204,7 +268,7 @@ void unit_tests(){
     printf("get min block size when user size is 24 failed\n");
   }
 
-  // TODO tests: prepare_block_for_use
+  // tests: prepare_block_for_use
   initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
   test_prepare_block_for_use_case_0(&h_0, &h_1, &h_2); // less
   initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
@@ -219,4 +283,14 @@ void unit_tests(){
   test_get_previous_block_case_0(&h_0, &h_1, &h_2);
   initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
   test_get_previous_block_case_1(&h_0, &h_1, &h_2);
+
+  // tests: coalesce
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_coalesce_case_0(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_coalesce_case_1(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_coalesce_case_2(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_coalesce_case_3(&h_0, &h_1, &h_2);
 }
