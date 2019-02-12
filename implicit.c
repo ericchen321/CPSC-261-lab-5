@@ -123,15 +123,11 @@ static inline void *coalesce(heap *h, void *first_block_start)
   // of second to total size.
   if(!block_is_in_use(next)&& is_within_heap_range(h,next)){
     int total_size = get_block_size(first_block_start)+ get_block_size(next);
-    void* footer = first_block_start + total_size - 4;
-
-    *(block_size_t*) footer = total_size;
-    *(block_size_t*) first_block_start = total_size;
-
+    set_block_header(first_block_start, total_size, 0);
     return first_block_start;
   }
 }
-  return NULL; //return NULL if block not coalesced 
+  return first_block_start; //return unmodified first block if block not coalesced 
 }
 
 /*
