@@ -158,7 +158,19 @@ static inline block_size_t get_size_to_allocate(block_size_t user_size)
 static inline void *prepare_block_for_use(void *block_start, block_size_t real_size)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
-  return NULL;
+  block_size_t blk_size = get_block_size(block_start);
+  if(blk_size < real_size){
+    return NULL;
+  }
+  else if(blk_size > 2*real_size || blk_size >= real_size + MAX_UNUSED_BYTES){
+    set_block_header(block_start, real_size, 1);
+    set_block_header(block_start+real_size, (blk_size - real_size), 0);
+    return block_start;
+  }
+  else{
+    set_block_header(block_start, blk_size, 1);
+    return block_start;
+  }
 }
 
 /*
@@ -345,4 +357,11 @@ void *wrapper_get_next_block(void *block_start){
 block_size_t wrapper_get_block_size(void *block_start)
 {
   return get_block_size(block_start);
+}
+
+/*
+ * wrapper function for block_is_in_use
+ */
+int wrapper_block_is_in_use(void *block_start){
+  return block_is_in_use(block_start);
 }

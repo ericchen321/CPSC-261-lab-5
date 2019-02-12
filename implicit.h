@@ -95,4 +95,8 @@ void *wrapper_get_next_block(void *block_start);
  */
 block_size_t wrapper_get_block_size(void *block_start);
 
+/*
+ * wrapper function for block_is_in_use
+ */
+int wrapper_block_is_in_use(void *block_start);
 #endif
