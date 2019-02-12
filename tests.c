@@ -10,7 +10,7 @@
  * initialize 3 heaps with given searching algorithm:
  * h_0: a 64B heap with a single 24B free block
  * h_1: a 256B heap with blocks: 16B(u)-32B(f)-64B(f)-32B(f)-16B(u)-32B(u)-24B(f)
- * h_2: a 1024B heap with blocks: 48B(u)-512B(f)-428B(f)
+ * h_2: a 1024B heap with blocks: 48B(u)-512B(f)-424B(f)
  */
 void initialize_heaps(heap** h_0, heap** h_1, heap** h_2, search_alg_t search_alg){
   void* block_start;
@@ -58,6 +58,74 @@ void initialize_heaps(heap** h_0, heap** h_1, heap** h_2, search_alg_t search_al
   if(!wrapper_is_within_heap_range(*h_2, block_start + 423)){
     printf("ERROR: dividing blocks for h_2 failed\n");
     return;
+  }
+}
+
+/* case: given block's size is less than requested size
+ */
+void test_prepare_block_for_use_case_0(heap **h_0, heap **h_1, heap **h_2){
+  void* blk = (*h_1)->start;
+  blk = wrapper_get_next_block(blk); // 32B free blk
+  block_size_t size = 256;
+  if(wrapper_prepare_block_for_use(blk, size) == NULL){}
+  else{
+    printf("prepare block when requested size is greater than given free block test failed\n");
+  }
+}
+
+/* case: given block's size is more than twice of requested size
+ */
+void test_prepare_block_for_use_case_1(heap **h_0, heap **h_1, heap **h_2){
+  void* blk = (*h_1)->start;
+  blk = wrapper_get_next_block(blk);
+  blk = wrapper_get_next_block(blk); // 64B free block
+  void* next_blk = wrapper_get_next_block(blk);
+  block_size_t size = 16;
+  blk = wrapper_prepare_block_for_use(blk, size);
+  if(blk != NULL
+      && wrapper_block_is_in_use(blk)
+      && wrapper_get_block_size(blk) == 16
+      && wrapper_get_block_size(wrapper_get_next_block(blk)) == 48
+      && !wrapper_block_is_in_use(wrapper_get_next_block(blk))
+      && wrapper_get_block_size(next_blk) == 32){}
+  else{
+    printf("prepare block when given block is twice of requested size failed\n");
+  }
+}
+
+/* case: given block's size >= requested size + MAX_UNUSED_BYTES
+ */
+void test_prepare_block_for_use_case_2(heap **h_0, heap **h_1, heap **h_2){
+  void* blk = (*h_2)->start;
+  blk = wrapper_get_next_block(blk); // 512B free block
+  void* next_blk = wrapper_get_next_block(blk);
+  block_size_t size = 264;
+  blk = wrapper_prepare_block_for_use(blk, size);
+  if(blk != NULL
+      && wrapper_block_is_in_use(blk)
+      && wrapper_get_block_size(blk) == 264
+      && wrapper_get_block_size(wrapper_get_next_block(blk)) == 248
+      && !wrapper_block_is_in_use(wrapper_get_next_block(blk))
+      && wrapper_get_block_size(next_blk) == 424){}
+  else{
+    printf("prepare block when given block's size >= requested size + MAX_UNUSED_BYTES failed\n");
+  }
+}
+
+/* case: given block's size is enough for requested size, and does not require splitting
+ */
+void test_prepare_block_for_use_case_3(heap **h_0, heap **h_1, heap **h_2){
+  void* blk = (*h_1)->start;
+  blk = wrapper_get_next_block(blk);
+  blk = wrapper_get_next_block(blk); // 64B free block
+  block_size_t size = 48;
+  blk = wrapper_prepare_block_for_use(blk, size);
+  if(blk != NULL
+      && wrapper_block_is_in_use(blk)
+      && wrapper_get_block_size(blk) == 64
+      && wrapper_get_block_size(wrapper_get_next_block(blk)) == 32){}
+  else{
+    printf("prepare block when block size and requrested size implies no splitting failed\n");
   }
 }
 
@@ -137,6 +205,14 @@ void unit_tests(){
   }
 
   // TODO tests: prepare_block_for_use
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_prepare_block_for_use_case_0(&h_0, &h_1, &h_2); // less
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_prepare_block_for_use_case_1(&h_0, &h_1, &h_2); // more than twice
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_prepare_block_for_use_case_2(&h_0, &h_1, &h_2); // at least MAX_UNUSED_BYTES longer
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_prepare_block_for_use_case_3(&h_0, &h_1, &h_2); // allocate without splitting
 
   // tests: get_previous_block
   initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
