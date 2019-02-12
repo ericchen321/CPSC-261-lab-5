@@ -61,7 +61,9 @@ void initialize_heaps(heap** h_0, heap** h_1, heap** h_2, search_alg_t search_al
   }
 }
 
-// case: try get prev block of a block in the middle, expects prev block
+/* case: try get prev block of a block in the middle, expects prev block
+ *       the prev block is free (though should not be point of behavior change)
+ */
 void test_get_previous_block_case_0(heap **h_0, heap **h_1, heap **h_2){
   void* blk;
   blk = (*h_1)->start;
@@ -72,6 +74,20 @@ void test_get_previous_block_case_0(heap **h_0, heap **h_1, heap **h_2){
   if(blk != NULL && wrapper_get_block_size(blk) == 64){}
   else{
     printf("get prev block of 3rd block from h_1 failed\n");
+  }
+}
+
+/* case: try get prev block of a block in the middle, expects prev block
+ *       the prev block is occupied (though should not be point of behavior change)
+ */
+void test_get_previous_block_case_1(heap **h_0, heap **h_1, heap **h_2){
+  void* blk;
+  blk = (*h_1)->start;
+  blk = wrapper_get_next_block(blk);
+  blk = wrapper_get_previous_block(blk);
+  if(blk != NULL && wrapper_get_block_size(blk) == 16){}
+  else{
+    printf("get prev block of 1st block from h_1 failed\n");
   }
 }
 
@@ -125,4 +141,6 @@ void unit_tests(){
   // tests: get_previous_block
   initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
   test_get_previous_block_case_0(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_get_previous_block_case_1(&h_0, &h_1, &h_2);
 }
