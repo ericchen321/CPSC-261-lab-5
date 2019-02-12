@@ -73,7 +73,9 @@ static inline void *get_next_block(void *block_start)
 static inline void *get_previous_block(void *block_start)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
-
+  return block_start - get_block_size(block_start - HEADER_SIZE);
+  /*
+  FIXME: segfault for given inputs: heap 1, get prev block of 1st block
   void* prev = block_start - HEADER_SIZE;
   block_size_t size = *((block_size_t *) prev);
 
@@ -83,7 +85,7 @@ static inline void *get_previous_block(void *block_start)
   else{
     return block_start - get_block_size(block_start - size-1);
   }
-  
+  */
 }
 
 /*
