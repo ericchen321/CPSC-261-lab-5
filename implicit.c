@@ -69,7 +69,6 @@ static inline void *get_next_block(void *block_start)
 /*
  * Find the start of the previous block.
  */
-// FIXME: now requires user not passing in 0th block
 static inline void *get_previous_block(void *block_start)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
@@ -111,6 +110,7 @@ static inline int is_within_heap_range(heap *h, void *addr)
  * Coalesce a block with its consecutive block, only if both blocks are free.
  * Return a pointer to the beginning of the coalesced block.
  */
+// FIXME: now not handling next_fit situation
 static inline void *coalesce(heap *h, void *first_block_start)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
@@ -135,6 +135,7 @@ static inline void *coalesce(heap *h, void *first_block_start)
  * the user requested. Don't forget we need space for the header  and
  * footer, and that the user size may not be aligned.
  */
+// FIXME: not sure how to handle when user_size = 0
 static inline block_size_t get_size_to_allocate(block_size_t user_size)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
@@ -247,6 +248,7 @@ block_size_t heap_find_avg_free_block_size(heap *h)
  * a next fit search strategy, and h->next is pointing to a block that
  * is to be coalesced.
  */
+// FIXME: now not handling next_fit situation
 void heap_free(heap *h, void *payload)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
@@ -276,6 +278,7 @@ static void *malloc_best_fit(heap *h, block_size_t user_size)
  * Malloc a block on the heap h, using next fit. Return NULL if no block
  * large enough to satisfy the request exits.
  */
+// FIXME: may need to change implementation of a couple of previous functions (coalesce, heap_free, etc.)
 static void *malloc_next_fit(heap *h, block_size_t user_size)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
