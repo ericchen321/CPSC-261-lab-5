@@ -272,6 +272,17 @@ void test_malloc_first_fit_case_2(heap** h_0, heap** h_1, heap** h_2){
   }
 }
 
+/* case: first fit, from h_0 requests 0B, expects returning
+ *       NULL ptr
+ */
+void test_malloc_first_fit_case_3(heap** h_0, heap** h_1, heap** h_2){
+  void* payload = heap_malloc(*h_0, 0);
+  if(payload == NULL){}
+  else{
+    printf("first fit, from h_0 requests 0B failed\n");
+  }
+}
+
 /*
  * running all unit tests
  */
@@ -350,4 +361,6 @@ void unit_tests(){
   test_malloc_first_fit_case_1(&h_0, &h_1, &h_2);
   initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
   test_malloc_first_fit_case_2(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_malloc_first_fit_case_3(&h_0, &h_1, &h_2);
 }
