@@ -252,6 +252,9 @@ block_size_t heap_find_avg_free_block_size(heap *h)
 void heap_free(heap *h, void *payload)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
+  void* blk = get_block_start(payload);
+  block_size_t size = get_block_size(blk);
+  set_block_header(blk, size, 0);
 }
 
 /*
