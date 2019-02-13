@@ -110,7 +110,6 @@ static inline int is_within_heap_range(heap *h, void *addr)
  * Coalesce a block with its consecutive block, only if both blocks are free.
  * Return a pointer to the beginning of the coalesced block.
  */
-// FIXME: now not handling next_fit situation
 static inline void *coalesce(heap *h, void *first_block_start)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
@@ -124,6 +123,8 @@ static inline void *coalesce(heap *h, void *first_block_start)
     if(is_within_heap_range(h, next) && !block_is_in_use(next)){
       int total_size = get_block_size(first_block_start)+ get_block_size(next);
       set_block_header(first_block_start, total_size, 0);
+      if(next == h->next)
+        h->next = first_block_start; // if h->next is being coalesced, then set h->next to the combined block
       return first_block_start;
     }
   }
@@ -248,7 +249,6 @@ block_size_t heap_find_avg_free_block_size(heap *h)
  * a next fit search strategy, and h->next is pointing to a block that
  * is to be coalesced.
  */
-// FIXME: now not handling next_fit situation
 void heap_free(heap *h, void *payload)
 {
   /* TO BE COMPLETED BY THE STUDENT. */

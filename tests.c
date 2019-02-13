@@ -207,17 +207,26 @@ void test_coalesce_case_2(heap **h_0, heap **h_1, heap **h_2){
   }
 }
 
-/* case: both blocks are free, can coalesce
+/* case: both blocks are free, can coalesce, but h employs next fit
+ *       searching alg and has h->next pointing to the block getting
+ *       merged. Expects h->next pointing to the combined block
  */
 void test_coalesce_case_3(heap **h_0, heap **h_1, heap **h_2){
+  if((*h_1)->search_alg != HEAP_NEXTFIT){
+    printf("coalesce test case error: not in next fit alg\n");
+    return;
+  }
+
   void* blk;
   blk = (*h_1)->start;
   blk = wrapper_get_next_block(blk); // blk is 1st one in h_1
+  (*h_1)->next = wrapper_get_next_block(blk);
 
   blk = wrapper_coalesce(*h_1, blk);
   if(blk != NULL
       && wrapper_get_block_size(blk) == 96
-      && wrapper_get_block_size(wrapper_get_next_block(blk)) == 32){}
+      && wrapper_get_block_size(wrapper_get_next_block(blk)) == 32
+      && wrapper_get_block_size((*h_1)->next) == 96){}
   else{
     printf("call coalesce when both blocks are free failed\n");
   }
@@ -415,7 +424,7 @@ void unit_tests(){
   test_coalesce_case_1(&h_0, &h_1, &h_2);
   initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
   test_coalesce_case_2(&h_0, &h_1, &h_2);
-  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_NEXTFIT);
   test_coalesce_case_3(&h_0, &h_1, &h_2);
 
   // tests: malloc_first_fit
@@ -437,4 +446,6 @@ void unit_tests(){
   test_malloc_best_fit_case_2(&h_0, &h_1, &h_2);
   initialize_heaps(&h_0, &h_1, &h_2, HEAP_BESTFIT);
   test_malloc_best_fit_case_3(&h_0, &h_1, &h_2);
+
+  // tests: malloc_next_fit
 }
