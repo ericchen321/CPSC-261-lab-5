@@ -223,7 +223,7 @@ void test_coalesce_case_3(heap **h_0, heap **h_1, heap **h_2){
   }
 }
 
-/* case: first fit, from h_0 requests 55B, expects returning 
+/* case: first fit, from h_1 requests 55B, expects returning 
  *       ptr to payload of 2nd block (64B, f)
  *       set as used, no splitting
  */
@@ -249,7 +249,7 @@ void test_malloc_first_fit_case_1(heap** h_0, heap** h_1, heap** h_2){
   void* payload = heap_malloc(*h_2, 1024);
   if(payload == NULL){}
   else{
-    printf("first fit, from h_2 requests 1024B failed\n");
+    printf("first fit, from h_2 requests 1024B test failed\n");
   }
 }
 
@@ -279,7 +279,71 @@ void test_malloc_first_fit_case_3(heap** h_0, heap** h_1, heap** h_2){
   void* payload = heap_malloc(*h_0, 0);
   if(payload == NULL){}
   else{
-    printf("first fit, from h_0 requests 0B failed\n");
+    printf("first fit, from h_0 requests 0B test failed\n");
+  }
+}
+
+/* case: best fit, from h_1 requests 0B, expects returning NULL
+ *       ptr
+ */
+void test_malloc_best_fit_case_0(heap** h_0, heap** h_1, heap** h_2){
+  void* payload = heap_malloc(*h_1, 0);
+  if(payload == NULL){}
+  else{
+    printf("best fit, from h_1 requests 0B test failed\n");
+  }
+}
+
+/* case: best fit, change 4th block to free first. Then
+ *       from h_1 requests 5B, expects returning ptr to
+ *       payload of 4th block (16B, u), no splitting
+ */
+void test_malloc_best_fit_case_1(heap** h_0, heap** h_1, heap** h_2){
+  void* blk = (*h_1)->start;
+  blk = wrapper_get_next_block(blk);
+  blk = wrapper_get_next_block(blk);
+  blk = wrapper_get_next_block(blk);
+  blk = wrapper_get_next_block(blk);
+  wrapper_set_block_header(blk, wrapper_get_block_size(blk), 0); // set 4th block to free
+
+  void* payload =heap_malloc(*h_1, 5);
+  if(payload != NULL
+      && wrapper_get_block_start(payload) == blk
+      && wrapper_block_is_in_use(blk)){}
+  else{
+    printf("best fit, from h_1 requests 5B failed\n");
+  }
+}
+
+/* case: best fit, from h_2 requests 120B, expects 2nd block split
+ *       to 128B(u) and 296B(f), returns ptr to payload to 
+ *       2nd block
+ */
+void test_malloc_best_fit_case_2(heap** h_0, heap** h_1, heap** h_2){
+  void* payload = heap_malloc(*h_2, 120);
+  void* blk = NULL;
+  if(payload != NULL)
+    blk = wrapper_get_block_start(payload);
+  if(payload != NULL
+      && blk != NULL
+      && wrapper_block_is_in_use(blk)
+      && wrapper_get_block_size(blk) == 128
+      && !wrapper_block_is_in_use(wrapper_get_next_block(blk))
+      && wrapper_get_block_size(wrapper_get_next_block(blk)) == 296){}
+  else{
+    printf("best fit, from h_2 requests 120B failed\n");
+    if(payload == NULL)
+      printf("got null return\n");
+  }
+}
+
+/* case: best fit, from h_2 requests 2048B, expects NULL ptr
+ */
+void test_malloc_best_fit_case_3(heap** h_0, heap** h_1, heap** h_2){
+  void* payload = heap_malloc(*h_2, 2048);
+  if(payload == NULL){}
+  else{
+    printf("best fit, from h_2 requests 2048B test failed\n");
   }
 }
 
@@ -363,4 +427,14 @@ void unit_tests(){
   test_malloc_first_fit_case_2(&h_0, &h_1, &h_2);
   initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
   test_malloc_first_fit_case_3(&h_0, &h_1, &h_2);
+
+  // tests: malloc_best_fit
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_BESTFIT);
+  test_malloc_best_fit_case_0(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_BESTFIT);
+  test_malloc_best_fit_case_1(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_BESTFIT);
+  test_malloc_best_fit_case_2(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_BESTFIT);
+  test_malloc_best_fit_case_3(&h_0, &h_1, &h_2);
 }
