@@ -273,7 +273,7 @@ static void *malloc_first_fit(heap *h, block_size_t user_size)
   void* blk;
   void* payload;
   for(blk = h->start; is_within_heap_range(h, blk); blk = get_next_block(blk)){
-    if(get_block_size(blk) >= real_size){
+    if(!block_is_in_use(blk) && get_block_size(blk) >= real_size){
       blk = prepare_block_for_use(blk, real_size);
       payload = get_payload(blk);
       return payload;
@@ -290,7 +290,31 @@ static void *malloc_first_fit(heap *h, block_size_t user_size)
 static void *malloc_best_fit(heap *h, block_size_t user_size)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
-  return NULL;
+  block_size_t real_size = get_size_to_allocate(user_size);
+  if(real_size == 2*HEADER_SIZE){
+    return NULL;
+  }
+
+  void* blk;
+  void* best_blk = NULL;
+  block_size_t diff;
+  block_size_t best_diff = h->size;
+  for(blk = h->start; is_within_heap_range(h, blk); blk = get_next_block(blk)){
+    diff = get_block_size(blk) - real_size;
+    // printf("now diff is %d, best diff is %d\n", diff, best_diff);
+    if(!block_is_in_use(blk) && diff >= 0 && diff <= best_diff){
+      best_diff = diff;
+      best_blk = blk;
+    }
+  }
+
+  if(best_blk != NULL){
+    best_blk = prepare_block_for_use(best_blk, real_size);
+    return get_payload(best_blk);
+  }
+  else{
+    return NULL;
+  }
 }
 
 /*
