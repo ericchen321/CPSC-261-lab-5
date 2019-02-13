@@ -265,6 +265,21 @@ void heap_free(heap *h, void *payload)
 static void *malloc_first_fit(heap *h, block_size_t user_size)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
+  block_size_t real_size = get_size_to_allocate(user_size);
+  if(real_size == 2*HEADER_SIZE){
+    return NULL;
+  }
+  
+  void* blk;
+  void* payload;
+  for(blk = h->start; is_within_heap_range(h, blk); blk = get_next_block(blk)){
+    if(get_block_size(blk) >= real_size){
+      blk = prepare_block_for_use(blk, real_size);
+      payload = get_payload(blk);
+      return payload;
+    }
+  }
+
   return NULL;
 }
 
@@ -367,4 +382,11 @@ block_size_t wrapper_get_block_size(void *block_start)
  */
 int wrapper_block_is_in_use(void *block_start){
   return block_is_in_use(block_start);
+}
+
+/*
+ * wrapper function for get_block_start
+ */
+void* wrapper_get_block_start(void* payload){
+  return get_block_start(payload);
 }

@@ -6,7 +6,7 @@
 /*
  * Set to 1 for additional debugging statements.
  */
-#define DEBUG 1
+#define DEBUG 0
 
 /*
  * Default size for the heap is 2MB( 2^21 B).

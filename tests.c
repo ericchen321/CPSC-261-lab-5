@@ -223,6 +223,55 @@ void test_coalesce_case_3(heap **h_0, heap **h_1, heap **h_2){
   }
 }
 
+/* case: first fit, from h_0 requests 55B, expects returning 
+ *       ptr to payload of 2nd block (64B, f)
+ *       set as used, no splitting
+ */
+void test_malloc_first_fit_case_0(heap** h_0, heap** h_1, heap** h_2){
+  void* payload = NULL;
+  void* blk = NULL;
+  payload = heap_malloc(*h_1, 55);
+  if(payload != NULL)
+    blk = wrapper_get_block_start(payload);
+  if(payload != NULL
+      && blk != NULL
+      && wrapper_get_block_size(blk) == 64
+      && wrapper_block_is_in_use(blk)){}
+  else{
+    printf("first fit, from h_0 requests 62B failed\n");
+  }
+}
+
+/* case: first fit, from h_2 requests 1024B, expects returning 
+ *       NULL ptr
+ */
+void test_malloc_first_fit_case_1(heap** h_0, heap** h_1, heap** h_2){
+  void* payload = heap_malloc(*h_2, 1024);
+  if(payload == NULL){}
+  else{
+    printf("first fit, from h_2 requests 1024B failed\n");
+  }
+}
+
+/* case: first fit, from h_2 requests 120B, expects returning
+ *       ptr to payload of 1st block (512B, f), which should be
+ *       split to 128B(u) and 384B(f)
+ */
+void test_malloc_first_fit_case_2(heap** h_0, heap** h_1, heap** h_2){
+  void* payload = heap_malloc(*h_2, 120);
+  void* blk = NULL;
+  if(payload != NULL)
+    blk = wrapper_get_block_start(payload);
+  if(payload != NULL
+      && blk != NULL
+      && wrapper_block_is_in_use(blk)
+      && wrapper_get_block_size(blk) == 128
+      && wrapper_get_block_size(wrapper_get_next_block(blk))==384){}
+  else{
+    printf("first fit, from h_2 requests 128B failed\n");
+  }
+}
+
 /*
  * running all unit tests
  */
@@ -293,4 +342,12 @@ void unit_tests(){
   test_coalesce_case_2(&h_0, &h_1, &h_2);
   initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
   test_coalesce_case_3(&h_0, &h_1, &h_2);
+
+  // tests: malloc_first_fit
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_malloc_first_fit_case_0(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_malloc_first_fit_case_1(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_FIRSTFIT);
+  test_malloc_first_fit_case_2(&h_0, &h_1, &h_2);
 }
