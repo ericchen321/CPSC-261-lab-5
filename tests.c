@@ -356,6 +356,125 @@ void test_malloc_best_fit_case_3(heap** h_0, heap** h_1, heap** h_2){
   }
 }
 
+/* case: last returned block from malloc is still in use; requests 5B,
+ *       returns ptr to payload of 1st block, set to in use
+ */
+void test_malloc_next_fit_case_0(heap** h_0, heap** h_1, heap** h_2){
+  if((*h_1)->search_alg != HEAP_NEXTFIT){
+    printf("next fit test case error: not in next fit alg\n");
+    return;
+  }
+  void* prev_next = (*h_1)->next;
+  void* payload = heap_malloc(*h_1, 5);
+  void* curr_next = (*h_1)->next;
+
+  if(payload != NULL
+      && wrapper_get_block_size(prev_next) == 16
+      && wrapper_get_block_size(curr_next) == 32
+      && curr_next == wrapper_get_block_start(payload)
+      && wrapper_block_is_in_use(curr_next)){}
+  else{
+    printf("next fit, from h_1 requests 5B when next is in use failed\n");
+  }
+}
+
+/* case: last returned block from malloc is not in use anymore; requests
+ *       8B, last returned block has enough space
+ */
+void test_malloc_next_fit_case_1(heap** h_0, heap** h_1, heap** h_2){
+  if((*h_1)->search_alg != HEAP_NEXTFIT){
+    printf("next fit test case error: not in next fit alg\n");
+    return;
+  }
+
+  (*h_1)->next = wrapper_get_next_block((*h_1)->start);
+  void* prev_next = (*h_1)->next;
+  void* payload = heap_malloc(*h_1, 8);
+  void* curr_next = (*h_1)->next;
+
+  if(payload != NULL
+      && prev_next == curr_next
+      && wrapper_get_block_start(payload) == curr_next
+      && wrapper_get_block_size(curr_next) == 32
+      && wrapper_block_is_in_use(curr_next)){}
+  else{
+    printf("next fit, from h_1 requests 8B when next is free failed\n");
+  }
+}
+
+/* case: last returned block from malloc is not in use anymore; requests
+ *       44B, so has to move up next and allocate following block
+ */
+void test_malloc_next_fit_case_2(heap** h_0, heap** h_1, heap** h_2){
+  if((*h_1)->search_alg != HEAP_NEXTFIT){
+    printf("next fit test case error: not in next fit alg\n");
+    return;
+  }
+
+  (*h_1)->next = wrapper_get_next_block((*h_1)->start);
+  void* prev_next = (*h_1)->next;
+  void* payload = heap_malloc(*h_1, 44);
+  void* curr_next = (*h_1)->next;
+
+  if(payload != NULL
+      && prev_next == wrapper_get_previous_block(curr_next)
+      && wrapper_get_block_size(curr_next) == 64
+      && wrapper_get_block_start(payload) == curr_next
+      && wrapper_block_is_in_use(curr_next)){}
+  else{
+    printf("next fit, from h_1 requests 44B when next is free but not large enough test failed\n");
+  }
+}
+
+/* case: last returned block from malloc is near the end, needs to 
+ *       return to the start of the heap to continue searching before
+ *       finding a block
+ */
+void test_malloc_next_fit_case_3(heap** h_0, heap** h_1, heap** h_2){
+  if((*h_1)->search_alg != HEAP_NEXTFIT){
+    printf("next fit test case error: not in next fit alg\n");
+    return;
+  }
+
+  void* blk = (*h_1)->start;
+  int i;
+  for(i=0; i<5; i++){
+    blk = wrapper_get_next_block(blk);
+  }
+  (*h_1)->next = blk;
+  void* prev_next = (*h_1)->next;
+  void* payload = heap_malloc(*h_1, 24);
+  void* curr_next = (*h_1)->next;
+  
+  if(payload != NULL
+      && wrapper_get_block_size(prev_next) == 32
+      && wrapper_get_block_size(curr_next) == 32
+      && wrapper_get_block_start(payload) == curr_next
+      && wrapper_block_is_in_use(curr_next)){}
+  else{
+    printf("next fit, from h_1 requests 24B, needs to start from begining test failed\n");
+  }
+}
+
+/* case: no where in heap has block of enough size. Returns NULL ptr
+ */
+void test_malloc_next_fit_case_4(heap** h_0, heap** h_1, heap** h_2){
+  if((*h_1)->search_alg != HEAP_NEXTFIT){
+    printf("next fit test case error: not in next fit alg\n");
+    return;
+  }
+
+  void* prev_next = (*h_1)->next;
+  void* payload = heap_malloc(*h_1, 1024);
+  void* curr_next = (*h_1)->next;
+
+  if(payload == NULL
+      && curr_next == prev_next){}
+  else{
+    printf("next fit, from h_1 requests 1024B test failed\n");
+  }
+}
+
 /*
  * running all unit tests
  */
@@ -448,4 +567,14 @@ void unit_tests(){
   test_malloc_best_fit_case_3(&h_0, &h_1, &h_2);
 
   // tests: malloc_next_fit
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_NEXTFIT);
+  test_malloc_next_fit_case_0(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_NEXTFIT);
+  test_malloc_next_fit_case_1(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_NEXTFIT);
+  test_malloc_next_fit_case_2(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_NEXTFIT);
+  test_malloc_next_fit_case_3(&h_0, &h_1, &h_2);
+  initialize_heaps(&h_0, &h_1, &h_2, HEAP_NEXTFIT);
+  test_malloc_next_fit_case_4(&h_0, &h_1, &h_2);
 }
