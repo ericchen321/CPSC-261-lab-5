@@ -321,10 +321,34 @@ static void *malloc_best_fit(heap *h, block_size_t user_size)
  * Malloc a block on the heap h, using next fit. Return NULL if no block
  * large enough to satisfy the request exits.
  */
-// FIXME: may need to change implementation of a couple of previous functions (coalesce, heap_free, etc.)
 static void *malloc_next_fit(heap *h, block_size_t user_size)
 {
   /* TO BE COMPLETED BY THE STUDENT. */
+  block_size_t real_size = get_size_to_allocate(user_size);
+  if(real_size == 2*HEADER_SIZE){
+    return NULL;
+  }
+
+  void* blk;
+  void* payload;
+  for(blk = h->next; is_within_heap_range(h, blk); blk=get_next_block(blk)){
+    if(!block_is_in_use(blk) && get_block_size(blk)>=real_size){
+      blk = prepare_block_for_use(blk, real_size);
+      payload = get_payload(blk);
+      h->next = blk;
+      return payload;
+    }
+  }
+
+  for(blk = h->start; blk != h->next; blk=get_next_block(blk)){
+    if(!block_is_in_use(blk) && get_block_size(blk)>=real_size){
+      blk = prepare_block_for_use(blk, real_size);
+      payload = get_payload(blk);
+      h->next = blk;
+      return payload;
+    }
+  }
+
   return NULL;
 }
 

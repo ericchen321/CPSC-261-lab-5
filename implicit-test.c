@@ -98,6 +98,6 @@ int main(int argc, char *argv[])
    * Now run tests on all three types of search algorithm.
    */
   printf("First fit average block size: %lu\n", test_heap(HEAP_FIRSTFIT, 50000));
-  //printf("Next fit average block size: %lu\n", test_heap(HEAP_NEXTFIT, 50000));
+  printf("Next fit average block size: %lu\n", test_heap(HEAP_NEXTFIT, 50000));
   printf("Best fit average block size: %lu\n", test_heap(HEAP_BESTFIT, 50000));
 }
