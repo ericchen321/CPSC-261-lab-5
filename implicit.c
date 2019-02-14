@@ -256,6 +256,7 @@ void heap_free(heap *h, void *payload)
   block_size_t size = get_block_size(blk);
   set_block_header(blk, size, 0);
   blk = coalesce(h, blk);
+  coalesce(h, get_previous_block(blk));
 }
 
 /*
